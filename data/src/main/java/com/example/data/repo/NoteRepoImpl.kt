@@ -19,8 +19,8 @@ class NoteRepoImpl @Inject constructor(private val realm: Realm) : NoteRepositor
         }
     }
 
-    override fun insertNote(note: Note) {
-        realm.writeBlocking {
+    override suspend fun insertNote(note: Note) {
+        realm.write {
             copyToRealm(
                 NoteEntity(
                     title = note.title
@@ -29,10 +29,13 @@ class NoteRepoImpl @Inject constructor(private val realm: Realm) : NoteRepositor
         }
     }
 
-    override fun deleteNote(note: Note) {
-        realm.writeBlocking {
+    override suspend fun deleteNote(note: Note) {
+        realm.write {
             findLatest(
-                copyToRealm(NoteEntity(note.id, note.title),UpdatePolicy.ALL)
+                copyToRealm(
+                    NoteEntity(note.id, note.title),
+                    UpdatePolicy.ALL
+                )
             ).also {
                 it?.let {
                     delete(it)

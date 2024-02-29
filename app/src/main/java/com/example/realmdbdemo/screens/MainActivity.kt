@@ -33,16 +33,25 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     floatingActionButton = {
                         FilledIconButton(onClick = {
-                            vm.insertNote(Note(id = System.currentTimeMillis(),title = Random.nextInt(1000).toString()))
+                            vm.insertNote(
+                                Note(
+                                    id = System.currentTimeMillis(),
+                                    title = Random.nextInt(1000).toString()
+                                )
+                            )
                         }) {
                             Icon(imageVector = Icons.Filled.Add, contentDescription = null)
                         }
                     },
                 ) {
-                    LazyColumn(modifier = Modifier.padding(it).padding(16.dp)) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .padding(it)
+                            .padding(16.dp)
+                    ) {
                         notes.value?.let { notes ->
                             items(notes) { note ->
-                                Text(text = note.title,modifier = Modifier.clickable {
+                                Text(text = note.title, modifier = Modifier.clickable {
                                     vm.deleteNote(note)
                                 })
                             }
