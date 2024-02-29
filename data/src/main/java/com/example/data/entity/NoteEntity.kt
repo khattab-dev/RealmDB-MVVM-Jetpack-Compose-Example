@@ -7,7 +7,7 @@ import io.realm.kotlin.types.annotations.PrimaryKey
 open class NoteEntity(
     @PrimaryKey
     private var _id: Long = System.currentTimeMillis(),
-    private var title: String
+    var title: String
 ) : RealmObject {
 
     // Empty constructor for realm

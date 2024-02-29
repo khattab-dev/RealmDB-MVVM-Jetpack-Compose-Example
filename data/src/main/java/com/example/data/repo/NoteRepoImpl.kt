@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.mongodb.kbson.ObjectId
 import javax.inject.Inject
+import kotlin.random.Random
 
 class NoteRepoImpl @Inject constructor(private val realm: Realm) : NoteRepository {
     override fun getNotes(): Flow<List<Note>> {
@@ -30,17 +31,40 @@ class NoteRepoImpl @Inject constructor(private val realm: Realm) : NoteRepositor
     }
 
     override suspend fun deleteNote(note: Note) {
+        val noteEntity = NoteEntity(note.id, note.title)
+
         realm.write {
-            findLatest(
-                copyToRealm(
-                    NoteEntity(note.id, note.title),
-                    UpdatePolicy.ALL
-                )
-            ).also {
-                it?.let {
-                    delete(it)
-                }
+            val managedNote = copyToRealm(
+                noteEntity,
+                UpdatePolicy.ALL
+            )
+
+            findLatest(managedNote).also {
+                it?.let { delete(it) }
             }
+        }
+    }
+
+    override suspend fun updateNote(note: Note) {
+        val noteEntity = NoteEntity(note.id, note.title)
+
+        realm.write {
+            val managedNote = copyToRealm(
+                noteEntity,
+                UpdatePolicy.ALL
+            )
+
+            findLatest(managedNote).also {
+                it?.let { it.title = Random.nextInt(1000).toString() }
+            }
+        }
+    }
+
+    override suspend fun clearAllNotes() {
+        realm.write {
+            val notes = query<NoteEntity>().find()
+
+            delete(notes)
         }
     }
 }
