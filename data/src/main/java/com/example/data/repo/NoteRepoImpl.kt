@@ -31,30 +31,20 @@ class NoteRepoImpl @Inject constructor(private val realm: Realm) : NoteRepositor
     }
 
     override suspend fun deleteNote(note: Note) {
-        val noteEntity = NoteEntity(note.id, note.title)
-
         realm.write {
-            val managedNote = copyToRealm(
-                noteEntity,
-                UpdatePolicy.ALL
-            )
+            val noteEntity = realm.query<NoteEntity>("_id == ${note.id}",note.id).find().first()
 
-            findLatest(managedNote).also {
+            findLatest(noteEntity).also {
                 it?.let { delete(it) }
             }
         }
     }
 
     override suspend fun updateNote(note: Note) {
-        val noteEntity = NoteEntity(note.id, note.title)
-
         realm.write {
-            val managedNote = copyToRealm(
-                noteEntity,
-                UpdatePolicy.ALL
-            )
+            val noteEntity = realm.query<NoteEntity>("_id == ${note.id}",note.id).find().first()
 
-            findLatest(managedNote).also {
+            findLatest(noteEntity).also {
                 it?.let { it.title = Random.nextInt(1000).toString() }
             }
         }
